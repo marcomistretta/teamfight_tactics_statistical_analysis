@@ -18,6 +18,8 @@ def _reformat_A(df):
              "item1_9", "item2_9", "item3_9", "tier9", "unit10", "item1_10", "item2_10",
              "item3_10", "tier10", "unit11", "item1_11", "item2_11", "item3_11", "tier11",
              "aug1", "aug2", "aug3", "placement"]]
+
+    df.to_csv('format_A.csv', index=False)
     return df
 
 
@@ -208,7 +210,7 @@ def _reformat_I(df):
 
 
 def _reformat_K(df):
-    if False:
+    if True:
         #
         # item_list = df[["item1_1"]].values.flatten().tolist()
         # item_list.extend(df[["item2_1"]].values.flatten())
@@ -275,9 +277,9 @@ def _reformat_K(df):
     df1 = reformat_to(df1, "T", verbose=0)
 
     result = pd.concat([df_item_complete, df1], axis=1)
+    result.to_csv('format_K_CON_UN_SENSO.csv', index=False)
 
     return result
-
 
 def _reformat_U(df):
     tmp = pd.read_csv('format_T.csv')
@@ -392,4 +394,4 @@ if __name__ == "__main__":
     #
     # dataset = reformat_to(dataset, "T", verbose=1)
 
-    dataset = reformat_to(dataset, "Z", verbose=1, two_class=True)
+    dataset = reformat_to(dataset, "K", verbose=1, two_class=True)
