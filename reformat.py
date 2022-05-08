@@ -148,7 +148,8 @@ def _reformat_Z(df):
     df = pd.read_csv('export_dataframe.csv')
     df = reformat_to(df, "T", verbose=0)
 
-    df = df[["placement", "TFT6_Camille", "TFT6_Brand", "TFT6_JarvanIV", "TFT6_Illaoi", "TFT6_Nocturne", "TFT6_Darius", "TFT6_Ziggs",
+    df = df[["placement", "TFT6_Camille", "TFT6_Brand", "TFT6_JarvanIV", "TFT6_Illaoi", "TFT6_Nocturne", "TFT6_Darius",
+             "TFT6_Ziggs",
              "TFT6_Kassadin", "TFT6_Ezreal", "TFT6_Singed", "TFT6_Poppy", "TFT6_Twitch", "TFT6_Caitlyn", "TFT6_Zyra",
              "TFT6_Syndra", "TFT6_Sejuani", "TFT6_Quinn", "TFT6_Zilean", "TFT6_Talon", "TFT6_Swain", "TFT6_Corki",
              "TFT6_Ashe", "TFT6_Warwick", "TFT6_Lulu", "TFT6_RekSai", "TFT6_Blitzcrank", "TFT6_Vex", "TFT6_Lucian",
@@ -209,9 +210,44 @@ def _reformat_I(df):
     return result
 
 
+def _reformat_M(df):
+    if False:
+
+        df_item = pd.DataFrame(
+            columns=['BFSword', 'Bow', 'Ap', 'Tear', 'ChainVest', 'NegatronCloak', 'GiantsBelt', 'Spatula', 'Gloves'])
+        for index, row in df.iterrows():
+            print(index)
+
+            item_list = []
+            for i in range(1, 12):
+                item_list.append(row["item1_" + str(i)])
+                item_list.append(row["item2_" + str(i)])
+                item_list.append(row["item3_" + str(i)])
+
+            item_list = [item for item in item_list if item < 100 and item != 0]
+            single_item_list = [sum(map(lambda x: str(x).count(str(i)), item_list)) for i in range(1, 10)]
+            df_item.loc[index] = single_item_list
+        print(df_item)
+
+        df_item.to_csv('format_I.csv', index=False)
+
+        # df1 = df
+        # df = reformat_to(format="X", verbose=0)
+        # df.insert(loc=df.shape[1]-1, column=df1.columns[92:304], value=df1[92:304])
+    else:
+        df_item = pd.read_csv('format_I.csv')
+    df1 = pd.read_csv('export_dataframe.csv')
+
+    df1 = reformat_to(df1, "T", verbose=0)
+
+    result = pd.concat([df_item, df1], axis=1)
+
+    return result
+
+
 def _reformat_K(df):
-    if True:
-        #
+    if False:
+
         # item_list = df[["item1_1"]].values.flatten().tolist()
         # item_list.extend(df[["item2_1"]].values.flatten())
         # item_list.extend(df[["item3_1"]].values.flatten())
@@ -221,7 +257,7 @@ def _reformat_K(df):
         #     item_list.extend(df[["item2_2"]].values.flatten())
         #     item_list.extend(df[["item3_2"]].values.flatten())
         single_item = ['BFSword', 'Bow', 'Ap', 'Tear', 'ChainVest', 'NegatronCloak', 'GiantsBelt', 'Spatula', 'Gloves']
-
+        #                    1       2      3   4       5               6               7               8           9
         item_dict = {}
         for key, value in zip([i for i in range(1, 10)], single_item):
             item_dict[key] = value
@@ -271,7 +307,62 @@ def _reformat_K(df):
         # df = reformat_to(format="X", verbose=0)
         # df.insert(loc=df.shape[1]-1, column=df1.columns[92:304], value=df1[92:304])
     else:
+
+        single_item = ['BFSword', 'Bow', 'Ap', 'Tear', 'ChainVest', 'NegatronCloak', 'GiantsBelt', 'Spatula', 'Gloves']
+        #                    1       2      3   4       5               6               7               8           9
+        item_dict = {}
+        for key, value in zip([i for i in range(1, 10)], single_item):
+            item_dict[key] = value
+
+        inverse_item_ids = {v: k for k, v in item_dict.items()}
+
+        composite_item = []
+        composite_item_ids = []
+        for element in itertools.product(*[single_item, single_item]):
+            composite_item.append(str(element[0]) + '+' + str(element[1]))
+            composite_item_ids.append(str(inverse_item_ids[str(element[0])]) + str(inverse_item_ids[str(element[1])]))
+
+        composite_item_dict = {}
+        for i, _ in enumerate(composite_item):
+            composite_item_dict[composite_item_ids[i]] = composite_item[i]
+
         df_item_complete = pd.read_csv('format_K.csv')
+
+        real_item_names = ["Tacticians Crow", "Runaans Hurricane", "Morellonomicon", "Last Whisper", "Ionic Spark",
+                           "Recurve Bow", "B.F.Sword", "Warmogs Armor", "Thiefs Gloves", "Statikk Shiv",
+                           "Jeweled Gauntlet", "Infinity Edge", "Evil Giantslayer", "Dragons Claw", "Bramble Vest",
+                           "Blue Buff", "Archangels Staff", "Sparring Gloves", "Zephyr", "Titans Resolve",
+                           "Sunfire Cape", "Spear of Shojin", "Redemption", "Rabadons Deathcap", "Hand of Justice",
+                           "Guinsoos Rageblade", "Gargoyle Stoneplate", "Edge of Night", "Tear of the Goddess",
+                           "Needlessly Large Rod", "ZzRot Portal", "Zekes Herald", "Shroud of Stillness", "Quicksilver",
+                           "Locket of the Iron Solari", "Hextech Gunblade", "Frozen Heart", "Deathblade",
+                           "Chalice of Power", "Giants Belt", "Chain Vest", "Rapid Firecannon", "Banshees Claw",
+                           "Negatron Cloak"]
+        real_item_ids = [['88'], ['27', '72'], ['37', '73'], ['29', '92'], ['36', '63'], ['2'], ['1'], ['77'], ['99'],
+                         ['24', '42'],
+                         ['39', '93'], ['19', '91'], ['12', '21'], ['66'], ['55'], ['44'], ['34', '43'], ['9'],
+                         ['67', '76'],
+                         ['25', '52'], ['57', '75'], ['14', '41'], ['47', '74'], ['33'], ['49', '94'], ['23', '32'],
+                         ['56', '65'],
+                         ['15', '51'], ['4'], ['3'], ['27', '72'], ['17', '71'], ['59', '95'], ['69', '96'],
+                         ['35', '53'], ['13', '31'],
+                         ['45', '54'], ['11'], ['46', '64'], ['7'], ['5'], ['22'], ['79', '97'], ['6']]
+
+        realname_item_dict = {}
+        for id, key in enumerate(real_item_names):
+            realname_item_dict[key] = real_item_ids[id]
+
+        for item in real_item_names:
+            if len(realname_item_dict[item]) == 2:
+                df_item_complete[item] = df_item_complete[composite_item_dict[realname_item_dict[item][0]]] + \
+                                         df_item_complete[composite_item_dict[realname_item_dict[item][1]]]
+            else:
+                try:
+                    df_item_complete[item] = df_item_complete[composite_item_dict[realname_item_dict[item][0]]]
+                except:
+                    print(item)
+
+        df_item_complete.drop(composite_item, axis=1, inplace=True)
 
     df1 = pd.read_csv('export_dataframe.csv')
     df1 = reformat_to(df1, "T", verbose=0)
@@ -280,6 +371,7 @@ def _reformat_K(df):
     result.to_csv('format_K_CON_UN_SENSO.csv', index=False)
 
     return result
+
 
 def _reformat_U(df):
     tmp = pd.read_csv('format_T.csv')
@@ -337,6 +429,54 @@ def _reformat_X(df):
 
     return result
 
+def _reformat_DIO(df):
+
+    placement = df[["placement"]]
+
+    champ_list = df[["unit1"]].values.flatten().tolist()
+    champ_list.extend(df[["unit2"]].values.flatten())
+    champ_list.extend(df[["unit3"]].values.flatten())
+    champ_list.extend(df[["unit4"]].values.flatten())
+    champ_list.extend(df[["unit5"]].values.flatten())
+    champ_list.extend(df[["unit6"]].values.flatten())
+    champ_list.extend(df[["unit7"]].values.flatten())
+    champ_list.extend(df[["unit8"]].values.flatten())
+    champ_list.extend(df[["unit9"]].values.flatten())
+    champ_list.extend(df[["unit10"]].values.flatten())
+    champ_list.extend(df[["unit11"]].values.flatten())
+
+    champ_list = list(set(champ_list))
+    champ_list.remove('0')
+
+    for champ in champ_list:
+        # print(df.loc[df['unit1'] == champ, 'tier1'].values)
+        # print(df.loc[df['unit2'] == champ, 'tier2'].values)
+
+        champ_oc = np.empty((df.shape[0], 11))
+        item = np.empty((df.shape[0], 11,3))
+
+        for i in range(1, 12):
+            ch = df.loc[df['unit' + str(i)] == champ, 'tier' + str(i)].reindex(
+                list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
+            obj_1 = df.loc[df['unit' + str(i)] == champ, 'item1_' + str(i)].reindex(
+                list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
+            obj_2= df.loc[df['unit' + str(i)] == champ, 'item2_' + str(i)].reindex(
+                list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
+            obj_3= df.loc[df['unit' + str(i)] == champ, 'item3_' + str(i)].reindex(
+                list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
+
+            champ_oc[:, i - 1] = ch
+            item[:,i - 1,  0] = obj_1
+            item[:,i - 1,  1] = obj_2
+            item[:,i - 1,  2] = obj_3
+
+        tier_champ = np.amax(champ_oc, axis=1)
+        aaa = np.argmax(champ_oc, axis=1)
+        output_array = np.choose(aaa, item.T)
+
+        df.insert(loc=df.shape[1], column=champ, value=tier_champ)
+        print(champ)
+
 
 def reformat_to(df, format="A", verbose=0, two_class=False):
     if verbose == 1:
@@ -366,6 +506,8 @@ def reformat_to(df, format="A", verbose=0, two_class=False):
         df = _reformat_K(df)
     elif format == "Z":
         df = _reformat_Z(df)
+    elif format == "DIO":
+        df = _reformat_DIO(df)
     else:
         df = _reformat_E(df)
 
@@ -394,4 +536,4 @@ if __name__ == "__main__":
     #
     # dataset = reformat_to(dataset, "T", verbose=1)
 
-    dataset = reformat_to(dataset, "K", verbose=1, two_class=True)
+    dataset = reformat_to(dataset, "DIO", verbose=1, two_class=True)

@@ -153,29 +153,29 @@ if __name__ == "__main__":
                     two_class=True)
     cc.fit()
 
-    cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="C", test_size=0.25, encoding=1,
-                    two_class=True)
-    cc.fit()
-
-    cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="A", test_size=0.25, encoding=1,
-                    two_class=True)
-    cc.fit()
-
-    cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="D", test_size=0.25, encoding=1,
-                    two_class=True)
-    cc.fit()
-
-    cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="T", test_size=0.25, encoding=0,
-                    two_class=True)
-    cc.fit()
-
-    cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="I", test_size=0.25, encoding=0,
-                    two_class=True)
-    cc.fit()
-
-    cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="X", test_size=0.25, encoding=0,
-                    two_class=True)
-    cc.fit()
+    # cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="C", test_size=0.25, encoding=1,
+    #                 two_class=True)
+    # cc.fit()
+    #
+    # cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="A", test_size=0.25, encoding=1,
+    #                 two_class=True)
+    # cc.fit()
+    #
+    # cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="D", test_size=0.25, encoding=1,
+    #                 two_class=True)
+    # cc.fit()
+    #
+    # cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="T", test_size=0.25, encoding=0,
+    #                 two_class=True)
+    # cc.fit()
+    #
+    # cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="I", test_size=0.25, encoding=0,
+    #                 two_class=True)
+    # cc.fit()
+    #
+    # cc = Classifier(model="DT", verbose=1, fract=3, cv_val=False, format="X", test_size=0.25, encoding=0,
+    #                 two_class=True)
+    # cc.fit()
 
     # fig = plt.figure(figsize=(100, 50))
     # _ = plot_tree(cc.classifier, feature_names=cc.dataset.columns.values.tolist(), class_names=["tette", "win"],
