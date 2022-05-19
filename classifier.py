@@ -3,11 +3,10 @@ from numpy import ravel
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier, plot_tree, export_graphviz
-from matplotlib import pyplot as plt
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.tree import DecisionTreeClassifier
 
 from reformat import *
 
@@ -67,14 +66,12 @@ class Classifier:
             self.classifier = SVC(kernel='rbf', random_state=0, verbose=0)
         # XXX rf
         elif self.model == "RF":
-            # TODO hyperparameter tuning (check session buddy) on MAX_DEPTH
             # max_depth = None
             print("Random Forest classifier")
             self.classifier = RandomForestClassifier(random_state=0, verbose=0)
         elif self.model == "DT":
             N = self.dataset.shape[0]
             N = int(N / self.fract)
-            # TODO hyperparameter tuning (check session buddy) on MAX_DEPTH
             # max_depth = None
             min_samples_leaf = int(N / 500)
             print("Decision Tree classifier")

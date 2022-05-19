@@ -57,7 +57,6 @@ if model == "SVM":
     classifier = SVC(kernel='rbf', random_state=0, verbose=verbose_level)
 # XXX rf
 elif model == "rf":
-    # TODO hyperparameter tuning (check session buddy) on MAX_DEPTH
     # max_depth = None
     print("Random Forest classifier")
     classifier = RandomForestClassifier(random_state=0, verbose=verbose_level)

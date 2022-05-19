@@ -1,4 +1,3 @@
-
 def merge_traits(df):
     df1 = df.iloc[:, 9:37]
     list = []

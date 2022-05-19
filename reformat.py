@@ -24,7 +24,6 @@ def _reformat_A(df):
 
 
 def _reformat_B(df):
-    # TODO provare un'altra idea
     '''
     riduzione del FORMATO_A
     minimal 56+1 colonne
@@ -337,7 +336,7 @@ def _reformat_K(df):
                            "Needlessly Large Rod", "ZzRot Portal", "Zekes Herald", "Shroud of Stillness", "Quicksilver",
                            "Locket of the Iron Solari", "Hextech Gunblade", "Frozen Heart", "Deathblade",
                            "Chalice of Power", "Giants Belt", "Chain Vest", "Rapid Firecannon", "Banshees Claw",
-                           "Negatron Cloak"]
+                           "Negatron Cloak", "Bloodthirster"]
         real_item_ids = [['88'], ['27', '72'], ['37', '73'], ['29', '92'], ['36', '63'], ['2'], ['1'], ['77'], ['99'],
                          ['24', '42'],
                          ['39', '93'], ['19', '91'], ['12', '21'], ['66'], ['55'], ['44'], ['34', '43'], ['9'],
@@ -346,7 +345,8 @@ def _reformat_K(df):
                          ['56', '65'],
                          ['15', '51'], ['4'], ['3'], ['27', '72'], ['17', '71'], ['59', '95'], ['69', '96'],
                          ['35', '53'], ['13', '31'],
-                         ['45', '54'], ['11'], ['46', '64'], ['7'], ['5'], ['22'], ['79', '97'], ['6']]
+                         ['45', '54'], ['11'], ['46', '64'], ['7'], ['5'], ['22'], ['79', '97'], ['6'],
+                         [['16'], ['61']]]
 
         realname_item_dict = {}
         for id, key in enumerate(real_item_names):
@@ -429,7 +429,376 @@ def _reformat_X(df):
 
     return result
 
-def _reformat_DIO(df):
+
+def _reformat_od(df):
+    real_item_names = ["TacticiansCrow", "RunaansHurricane", "Morellonomicon", "LastWhisper", "IonicSpark",
+                       "RecurveBow", "B.F.Sword", "WarmogsArmor", "ThiefsGloves", "StatikkShiv",
+                       "JeweledGauntlet", "InfinityEdge", "EvilGiantslayer", "DragonsClaw", "BrambleVest",
+                       "BlueBuff", "ArchangelsStaff", "SparringGloves", "Zephyr", "TitansResolve",
+                       "SunfireCape", "SpearofShojin", "Redemption", "RabadonsDeathcap", "HandofJustice",
+                       "GuinsoosRageblade", "GargoyleStoneplate", "EdgeofNight", "TearoftheGoddess",
+                       "NeedlesslyLargeRod", "ZzRotPortal", "ZekesHerald", "ShroudofStillness", "Quicksilver",
+                       "LocketoftheIronSolari", "HextechGunblade", "FrozenHeart", "Deathblade",
+                       "ChaliceofPower", "GiantsBelt", "ChainVest", "RapidFirecannon", "BansheesClaw",
+                       "NegatronCloak", "Bloodthirster"]
+
+    real_item_ids = [['88'], ['27', '72'], ['37', '73'], ['29', '92'], ['36', '63'], ['2'], ['1'], ['77'], ['99'],
+                     ['24', '42'],
+                     ['39', '93'], ['19', '91'], ['12', '21'], ['66'], ['55'], ['44'], ['34', '43'], ['9'],
+                     ['67', '76'],
+                     ['25', '52'], ['57', '75'], ['14', '41'], ['47', '74'], ['33'], ['49', '94'], ['23', '32'],
+                     ['56', '65'],
+                     ['15', '51'], ['4'], ['3'], ['27', '72'], ['17', '71'], ['59', '95'], ['69', '96'],
+                     ['35', '53'], ['13', '31'],
+                     ['45', '54'], ['11'], ['46', '64'], ['7'], ['5'], ['22'], ['79', '97'], ['6'], ['16', '61']]
+
+    realname_item_dict = {}
+    for id, key in enumerate(real_item_ids):
+        for sas in key:
+            realname_item_dict[sas] = real_item_names[id]
+
+    placement = df[["placement"]]
+
+    champ_list = df[["unit1"]].values.flatten().tolist()
+    champ_list.extend(df[["unit2"]].values.flatten())
+    champ_list.extend(df[["unit3"]].values.flatten())
+    champ_list.extend(df[["unit4"]].values.flatten())
+    champ_list.extend(df[["unit5"]].values.flatten())
+    champ_list.extend(df[["unit6"]].values.flatten())
+    champ_list.extend(df[["unit7"]].values.flatten())
+    champ_list.extend(df[["unit8"]].values.flatten())
+    champ_list.extend(df[["unit9"]].values.flatten())
+    champ_list.extend(df[["unit10"]].values.flatten())
+    champ_list.extend(df[["unit11"]].values.flatten())
+
+    champ_list = list(set(champ_list))
+    champ_list.remove('0')
+
+    df_merged = pd.DataFrame.copy(df, deep=True)
+
+    for champ in champ_list:
+        # print(df.loc[df['unit1'] == champ, 'tier1'].values)
+        # print(df.loc[df['unit2'] == champ, 'tier2'].values)
+
+        champ_oc = np.empty((df.shape[0], 11))
+        item1 = np.empty((df.shape[0], 11))
+        item2 = np.empty((df.shape[0], 11))
+        item3 = np.empty((df.shape[0], 11))
+
+        for i in range(1, 12):
+            ch = df.loc[df['unit' + str(i)] == champ, 'tier' + str(i)].reindex(
+                list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
+            obj_1 = df.loc[df['unit' + str(i)] == champ, 'item1_' + str(i)].reindex(
+                list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
+            obj_2 = df.loc[df['unit' + str(i)] == champ, 'item2_' + str(i)].reindex(
+                list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
+            obj_3 = df.loc[df['unit' + str(i)] == champ, 'item3_' + str(i)].reindex(
+                list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
+
+            champ_oc[:, i - 1] = ch
+            item1[:, i - 1] = obj_1
+            item2[:, i - 1] = obj_2
+            item3[:, i - 1] = obj_3
+
+        tier_champ = np.amax(champ_oc, axis=1)
+        real_items = [np.amax(item, axis=1) for item in [item1, item2, item3]]
+
+        suus = np.column_stack((real_items[0], real_items[1], real_items[2]))
+
+        squarer = lambda t: realname_item_dict[str(int(t))] if str(int(t)) in realname_item_dict.keys() else ""
+        vfunc = np.vectorize(squarer)
+        suus = vfunc(suus)
+
+        suus = np.sort(suus, axis=1)
+        items = np.char.add(np.char.add(suus[:, 0], suus[:, 1]), suus[:, 2])
+
+        Fix_Thief = lambda t: "ThiefsGloves" if "ThiefsGloves" in str(t) else t
+        vfunc = np.vectorize(Fix_Thief)
+        items = vfunc(items)
+
+        Fix_Empty = lambda t: "0" if "" == str(t) else t
+        vfunc = np.vectorize(Fix_Empty)
+        items = vfunc(items)
+
+        df.insert(loc=df.shape[1], column=champ, value=tier_champ)
+        df.insert(loc=df.shape[1], column=champ + '_items', value=items)
+
+        merged = np.char.add(tier_champ.astype(int).astype(str),
+                             np.char.add(np.char.add(suus[:, 0], suus[:, 1]), suus[:, 2]))
+        df_merged.insert(loc=df_merged.shape[1], column=champ, value=merged)
+
+        print(champ)
+
+    df.to_csv('format_od.csv', index=False)
+    df_merged.to_csv('format_og.csv', index=False)
+
+    df1 = pd.read_csv('export_dataframe.csv')
+    df1 = reformat_to(df1, "T", verbose=0)
+
+    result = pd.concat([df, df1], axis=1)
+    result.to_csv('format_od_fix_sense.csv', index=False)
+
+    result = pd.concat([df_merged, df1], axis=1)
+    result.to_csv('format_og_fix_sense.csv', index=False)
+
+    return result
+
+
+def _reformat_og(df):
+    real_item_names = ["TacticiansCrow", "RunaansHurricane", "Morellonomicon", "LastWhisper", "IonicSpark",
+                       "RecurveBow", "B.F.Sword", "WarmogsArmor", "ThiefsGloves", "StatikkShiv",
+                       "JeweledGauntlet", "InfinityEdge", "EvilGiantslayer", "DragonsClaw", "BrambleVest",
+                       "BlueBuff", "ArchangelsStaff", "SparringGloves", "Zephyr", "TitansResolve",
+                       "SunfireCape", "SpearofShojin", "Redemption", "RabadonsDeathcap", "HandofJustice",
+                       "GuinsoosRageblade", "GargoyleStoneplate", "EdgeofNight", "TearoftheGoddess",
+                       "NeedlesslyLargeRod", "ZzRotPortal", "ZekesHerald", "ShroudofStillness", "Quicksilver",
+                       "LocketoftheIronSolari", "HextechGunblade", "FrozenHeart", "Deathblade",
+                       "ChaliceofPower", "GiantsBelt", "ChainVest", "RapidFirecannon", "BansheesClaw",
+                       "NegatronCloak", "Bloodthirster"]
+
+    real_item_ids = [['88'], ['27', '72'], ['37', '73'], ['29', '92'], ['36', '63'], ['2'], ['1'], ['77'], ['99'],
+                     ['24', '42'],
+                     ['39', '93'], ['19', '91'], ['12', '21'], ['66'], ['55'], ['44'], ['34', '43'], ['9'],
+                     ['67', '76'],
+                     ['25', '52'], ['57', '75'], ['14', '41'], ['47', '74'], ['33'], ['49', '94'], ['23', '32'],
+                     ['56', '65'],
+                     ['15', '51'], ['4'], ['3'], ['27', '72'], ['17', '71'], ['59', '95'], ['69', '96'],
+                     ['35', '53'], ['13', '31'],
+                     ['45', '54'], ['11'], ['46', '64'], ['7'], ['5'], ['22'], ['79', '97'], ['6'], ['16''61']]
+
+    item_type_dict = {"TacticiansCrow": "Utility",
+                      "RunaansHurricane": "AttackDamage",
+                      "Morellonomicon": "Utility",
+                      "LastWhisper": "AttackDamage",
+                      "IonicSpark": "Tank",
+                      "WarmogsArmor": "Tank",
+                      "ThiefsGloves": "Utility",
+                      "StatikkShiv": "AbilityPower",
+                      "JeweledGauntlet": "AbilityPower",
+                      "InfinityEdge": "AttackDamage",
+                      "EvilGiantslayer": "AttackDamage",
+                      "DragonsClaw": "Tank",
+                      "BrambleVest": "Tank",
+                      "BlueBuff": "AbilityPower",
+                      "ArchangelsStaff": "AbilityPower",
+                      "Zephyr": "Utility",
+                      "TitansResolve": "Tank",
+                      "SunfireCape": "Tank",
+                      "SpearofShojin": "AbilityPower",
+                      "Redemption": "Tank",
+                      "RabadonsDeathcap": "AbilityPower",
+                      "HandofJustice": "Utility",
+                      "GuinsoosRageblade": "AttackDamage",
+                      "GargoyleStoneplate": "Tank",
+                      "EdgeofNight": "Utility",
+                      "ZzRotPortal": "Utility",
+                      "ZekesHerald": "Support",
+                      "ShroudofStillness": "Utility",
+                      "Quicksilver": "Utility",
+                      "LocketoftheIronSolari": "Support",
+                      "HextechGunblade": "AbilityPower",
+                      "FrozenHeart": "Utility",
+                      "Deathblade": "AttackDamage",
+                      "ChaliceofPower": "Support",
+                      "RapidFirecannon": "AttackDamage",
+                      "BansheesClaw": "Support",
+                      "Bloodthirster": "AttackDamage"}
+
+    support_mask = {"": 0,
+                    "TacticiansCrow": 0,
+                    "RunaansHurricane": 0,
+                    "Morellonomicon": 0,
+                    "LastWhisper": 0,
+                    "IonicSpark": 0,
+                    "WarmogsArmor": 0,
+                    "ThiefsGloves": 0,
+                    "StatikkShiv": 0,
+                    "JeweledGauntlet": 0,
+                    "InfinityEdge": 0,
+                    "EvilGiantslayer": 0,
+                    "DragonsClaw": 0,
+                    "BrambleVest": 0,
+                    "BlueBuff": 0,
+                    "ArchangelsStaff": 0,
+                    "Zephyr": 0,
+                    "TitansResolve": 0,
+                    "SunfireCape": 0,
+                    "SpearofShojin": 0,
+                    "Redemption": 0,
+                    "RabadonsDeathcap": 0,
+                    "HandofJustice": 0,
+                    "GuinsoosRageblade": 0,
+                    "GargoyleStoneplate": 0,
+                    "EdgeofNight": 0,
+                    "ZzRotPortal": 0,
+                    "ZekesHerald": 1,
+                    "ShroudofStillness": 0,
+                    "Quicksilver": 0,
+                    "LocketoftheIronSolari": 1,
+                    "HextechGunblade": 0,
+                    "FrozenHeart": 0,
+                    "Deathblade": 0,
+                    "ChaliceofPower": 1,
+                    "RapidFirecannon": 0,
+                    "BansheesClaw": 1,
+                    "Bloodthirster": 0}
+
+    utility_mask = {"TacticiansCrow": 1,
+                    "RunaansHurricane": 0,
+                    "Morellonomicon": 1,
+                    "LastWhisper": 0,
+                    "IonicSpark": 0,
+                    "WarmogsArmor": 0,
+                    "ThiefsGloves": 1,
+                    "StatikkShiv": 0,
+                    "JeweledGauntlet": 0,
+                    "InfinityEdge": 0,
+                    "EvilGiantslayer": 0,
+                    "DragonsClaw": 0,
+                    "BrambleVest": 0,
+                    "BlueBuff": 0,
+                    "ArchangelsStaff": 0,
+                    "Zephyr": 1,
+                    "TitansResolve": 0,
+                    "SunfireCape": 0,
+                    "SpearofShojin": 0,
+                    "Redemption": 0,
+                    "RabadonsDeathcap": 0,
+                    "HandofJustice": 1,
+                    "GuinsoosRageblade": 0,
+                    "GargoyleStoneplate": 0,
+                    "EdgeofNight": 1,
+                    "ZzRotPortal": 1,
+                    "ZekesHerald": 0,
+                    "ShroudofStillness": 1,
+                    "Quicksilver": 1,
+                    "LocketoftheIronSolari": 0,
+                    "HextechGunblade": 0,
+                    "FrozenHeart": 1,
+                    "Deathblade": 0,
+                    "ChaliceofPower": 0,
+                    "RapidFirecannon": 0,
+                    "BansheesClaw": 0,
+                    "Bloodthirster": 0}
+
+    ad_mask = {"TacticiansCrow": 0,
+               "RunaansHurricane": 1,
+               "Morellonomicon": 0,
+               "LastWhisper": 1,
+               "IonicSpark": 0,
+               "WarmogsArmor": 0,
+               "ThiefsGloves": 0,
+               "StatikkShiv": 0,
+               "JeweledGauntlet": 0,
+               "InfinityEdge": 1,
+               "EvilGiantslayer": 1,
+               "DragonsClaw": 0,
+               "BrambleVest": 0,
+               "BlueBuff": 0,
+               "ArchangelsStaff": 0,
+               "Zephyr": 0,
+               "TitansResolve": 0,
+               "SunfireCape": 0,
+               "SpearofShojin": 0,
+               "Redemption": 0,
+               "RabadonsDeathcap": 0,
+               "HandofJustice": 0,
+               "GuinsoosRageblade": 1,
+               "GargoyleStoneplate": 0,
+               "EdgeofNight": 0,
+               "ZzRotPortal": 0,
+               "ZekesHerald": 0,
+               "ShroudofStillness": 0,
+               "Quicksilver": 0,
+               "LocketoftheIronSolari": 0,
+               "HextechGunblade": 0,
+               "FrozenHeart": 0,
+               "Deathblade": 1,
+               "ChaliceofPower": 0,
+               "RapidFirecannon": 1,
+               "BansheesClaw": 0,
+               "Bloodthirster": 1}
+
+    ap_mask = {"TacticiansCrow": 0,
+               "RunaansHurricane": 0,
+               "Morellonomicon": 0,
+               "LastWhisper": 0,
+               "IonicSpark": 0,
+               "WarmogsArmor": 0,
+               "ThiefsGloves": 0,
+               "StatikkShiv": 1,
+               "JeweledGauntlet": 1,
+               "InfinityEdge": 0,
+               "EvilGiantslayer": 0,
+               "DragonsClaw": 0,
+               "BrambleVest": 0,
+               "BlueBuff": 1,
+               "ArchangelsStaff": 1,
+               "Zephyr": 0,
+               "TitansResolve": 0,
+               "SunfireCape": 0,
+               "SpearofShojin": 1,
+               "Redemption": 0,
+               "RabadonsDeathcap": 1,
+               "HandofJustice": 0,
+               "GuinsoosRageblade": 0,
+               "GargoyleStoneplate": 0,
+               "EdgeofNight": 0,
+               "ZzRotPortal": 0,
+               "ZekesHerald": 0,
+               "ShroudofStillness": 0,
+               "Quicksilver": 0,
+               "LocketoftheIronSolari": 0,
+               "HextechGunblade": 1,
+               "FrozenHeart": 0,
+               "Deathblade": 0,
+               "ChaliceofPower": 0,
+               "RapidFirecannon": 0,
+               "BansheesClaw": 0,
+               "Bloodthirster": 0}
+
+    tank_mask = {"TacticiansCrow": 0,
+                 "RunaansHurricane": 0,
+                 "Morellonomicon": 0,
+                 "LastWhisper": 0,
+                 "IonicSpark": 1,
+                 "WarmogsArmor": 1,
+                 "ThiefsGloves": 0,
+                 "StatikkShiv": 0,
+                 "JeweledGauntlet": 0,
+                 "InfinityEdge": 0,
+                 "EvilGiantslayer": 0,
+                 "DragonsClaw": 1,
+                 "BrambleVest": 1,
+                 "BlueBuff": 0,
+                 "ArchangelsStaff": 0,
+                 "Zephyr": 0,
+                 "TitansResolve": 1,
+                 "SunfireCape": 1,
+                 "SpearofShojin": 0,
+                 "Redemption": 1,
+                 "RabadonsDeathcap": 0,
+                 "HandofJustice": 0,
+                 "GuinsoosRageblade": 0,
+                 "GargoyleStoneplate": 1,
+                 "EdgeofNight": 0,
+                 "ZzRotPortal": 0,
+                 "ZekesHerald": 0,
+                 "ShroudofStillness": 0,
+                 "Quicksilver": 0,
+                 "LocketoftheIronSolari": 0,
+                 "HextechGunblade": 0,
+                 "FrozenHeart": 0,
+                 "Deathblade": 0,
+                 "ChaliceofPower": 0,
+                 "RapidFirecannon": 0,
+                 "BansheesClaw": 0,
+                 "Bloodthirster": 0}
+
+    realname_item_dict = {}
+    for id, key in enumerate(real_item_ids):
+        for sas in key:
+            realname_item_dict[sas] = real_item_names[id]
 
     placement = df[["placement"]]
 
@@ -453,29 +822,72 @@ def _reformat_DIO(df):
         # print(df.loc[df['unit2'] == champ, 'tier2'].values)
 
         champ_oc = np.empty((df.shape[0], 11))
-        item = np.empty((df.shape[0], 11,3))
+        item1 = np.empty((df.shape[0], 11))
+        item2 = np.empty((df.shape[0], 11))
+        item3 = np.empty((df.shape[0], 11))
 
         for i in range(1, 12):
             ch = df.loc[df['unit' + str(i)] == champ, 'tier' + str(i)].reindex(
                 list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
             obj_1 = df.loc[df['unit' + str(i)] == champ, 'item1_' + str(i)].reindex(
                 list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
-            obj_2= df.loc[df['unit' + str(i)] == champ, 'item2_' + str(i)].reindex(
+            obj_2 = df.loc[df['unit' + str(i)] == champ, 'item2_' + str(i)].reindex(
                 list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
-            obj_3= df.loc[df['unit' + str(i)] == champ, 'item3_' + str(i)].reindex(
+            obj_3 = df.loc[df['unit' + str(i)] == champ, 'item3_' + str(i)].reindex(
                 list(range(df.index.min(), df.index.max() + 1)), fill_value=0)
 
             champ_oc[:, i - 1] = ch
-            item[:,i - 1,  0] = obj_1
-            item[:,i - 1,  1] = obj_2
-            item[:,i - 1,  2] = obj_3
+            item1[:, i - 1] = obj_1
+            item2[:, i - 1] = obj_2
+            item3[:, i - 1] = obj_3
 
         tier_champ = np.amax(champ_oc, axis=1)
-        aaa = np.argmax(champ_oc, axis=1)
-        output_array = np.choose(aaa, item.T)
+        real_items = [np.amax(item, axis=1) for item in [item1, item2, item3]]
+
+        suus = np.column_stack((real_items[0], real_items[1], real_items[2]))
+
+        squarer = lambda t: realname_item_dict[str(int(t))] if str(int(t)) in realname_item_dict.keys() else ""
+        vfunc = np.vectorize(squarer)
+        suus = vfunc(suus)
+
+        support_lambda = lambda t: support_mask[str(t)] if str(t) in support_mask.keys() else 0
+        vfunc = np.vectorize(support_lambda)
+        support_item = np.sum(vfunc(suus), axis=1)
+
+        tank_lambda = lambda t: tank_mask[str(t)] if str(t) in tank_mask.keys() else 0
+        vfunc = np.vectorize(tank_lambda)
+        tank_item = np.sum(vfunc(suus), axis=1)
+
+        utility_lambda = lambda t: utility_mask[str(t)] if str(t) in utility_mask.keys() else 0
+        vfunc = np.vectorize(utility_lambda)
+        utility_item = np.sum(vfunc(suus), axis=1)
+
+        ap_lambda = lambda t: ap_mask[str(t)] if str(t) in ap_mask.keys() else 0
+        vfunc = np.vectorize(ap_lambda)
+        ap_item = np.sum(vfunc(suus), axis=1)
+
+        ad_lambda = lambda t: ad_mask[str(t)] if str(t) in ad_mask.keys() else 0
+        vfunc = np.vectorize(ad_lambda)
+        ad_item = np.sum(vfunc(suus), axis=1)
 
         df.insert(loc=df.shape[1], column=champ, value=tier_champ)
+        df.insert(loc=df.shape[1], column=champ + '_Support', value=support_item)
+        df.insert(loc=df.shape[1], column=champ + '_Tank', value=tank_item)
+        df.insert(loc=df.shape[1], column=champ + '_AttackDamage', value=ad_item)
+        df.insert(loc=df.shape[1], column=champ + '_AbilityPower', value=ap_item)
+        df.insert(loc=df.shape[1], column=champ + '_Utility', value=utility_item)
+
         print(champ)
+
+    df.to_csv('format_og.csv', index=False)
+
+    df1 = pd.read_csv('export_dataframe.csv')
+    df1 = reformat_to(df1, "T", verbose=0)
+
+    result = pd.concat([df, df1], axis=1)
+    result.to_csv('format_og_fix_sense.csv', index=False)
+
+    return result
 
 
 def reformat_to(df, format="A", verbose=0, two_class=False):
@@ -506,8 +918,10 @@ def reformat_to(df, format="A", verbose=0, two_class=False):
         df = _reformat_K(df)
     elif format == "Z":
         df = _reformat_Z(df)
-    elif format == "DIO":
-        df = _reformat_DIO(df)
+    elif format == "od":
+        df = _reformat_od(df)
+    elif format == "og":
+        df = _reformat_og(df)
     else:
         df = _reformat_E(df)
 
@@ -536,4 +950,4 @@ if __name__ == "__main__":
     #
     # dataset = reformat_to(dataset, "T", verbose=1)
 
-    dataset = reformat_to(dataset, "DIO", verbose=1, two_class=True)
+    dataset = reformat_to(dataset, "og", verbose=1, two_class=True)
